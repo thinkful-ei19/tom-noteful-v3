@@ -28,6 +28,7 @@ router.get('/notes', (req, res, next) => {
         .sort('created')
         .then(results => {
           console.log(results);
+          res.json(results);
         })
         .catch(console.error);
     })

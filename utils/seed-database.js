@@ -12,6 +12,7 @@ mongoose.connect(MONGODB_URI)
   .then(results => {
     console.info(`Inserted ${results.length} Notes`);
   })
+  .then(() => Note.createIndexes())
   .then(() => mongoose.disconnect())
   .catch(err => {
     console.error(err);

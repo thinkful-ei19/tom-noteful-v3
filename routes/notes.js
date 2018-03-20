@@ -15,17 +15,28 @@ const Note = require('../models/notes');
 router.get('/notes', (req, res, next) => {
   console.log('Get All Notes');
   mongoose.connect(MONGODB_URI)
+    .then(() => Note.createIndexes(
+      {
+        weights: {
+          title: 10,
+          content: 5
+        },
+      }
+    ))
     .then(() => {
       const { searchTerm } = req.query;
       let filter = {};
+      let metaScore = {};
+      let sort = 'created'; 
 
       if (searchTerm) {
-        const re = new RegExp(searchTerm, 'i');
-        filter.title = { $regex: re };
+        filter.$text = { $search: searchTerm };
+        metaScore.score = { $meta: 'textScore' };
+        sort = metaScore;
       }
 
-      return Note.find(filter)
-        .sort('created')
+      Note.find(filter, metaScore)
+        .sort(sort)
         .then(results => {
           res.status(200).json(results);
         })

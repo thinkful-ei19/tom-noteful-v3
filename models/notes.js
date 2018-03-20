@@ -7,6 +7,7 @@ const noteSchema = new mongoose.Schema({
   content: { type: String, index: true },
   created: {type: Date, default: Date.now},
 });
+noteSchema.index({ title: 'text', content: 'text' });
 noteSchema.set('toObject', {
   transform: function (doc, ret) {
     ret.id = ret._id;

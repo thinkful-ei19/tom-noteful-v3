@@ -27,8 +27,7 @@ router.get('/notes', (req, res, next) => {
       return Note.find(filter)
         .sort('created')
         .then(results => {
-          console.log(results);
-          res.json(results);
+          res.status(200).json(results);
         })
         .catch(console.error);
     })
@@ -46,10 +45,15 @@ router.get('/notes', (req, res, next) => {
   
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/notes/:id', (req, res, next) => {
-
+  const noteId = req.params.id;
   console.log('Get a Note');
-  res.json({ id: 2 });
-
+  mongoose.connect(MONGODB_URI)
+    .then(() => {
+      return Note.findById(noteId)
+        .then(results => {
+          res.status(200).json(results);
+        });
+    });
 });
 
 /* ========== POST/CREATE AN ITEM ========== */

@@ -46,7 +46,6 @@ router.get('/notes', (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
-  console.log('Get a Note');
   mongoose.connect(MONGODB_URI)
     .then(() => {
       return Note.findById(noteId)
@@ -58,9 +57,26 @@ router.get('/notes/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/notes', (req, res, next) => {
-
-  console.log('Create a Note');
-  res.location('path/to/new/document').status(201).json({ id: 2 });
+  const { title, content, folder_id, tags } = req.body; 
+  const newItem = { title, content, folder_id };
+  
+  /***** Never trust users - validate input *****/
+  if (!newItem.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  mongoose.connect(MONGODB_URI);
+  return Note.create({
+    title,
+    content,
+    folder_id,
+    tags,
+  })  
+    .then(results => {
+      res.location(`${req.originalUrl}`).status(201).json({results})
+    });
+  
 
 });
 
